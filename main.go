@@ -26,7 +26,6 @@ func main() {
 	query_request := "SELECT \"ResId\", \"ResName\" FROM tbl_dk_resource"
 
 	rows, err := db.Query(query_request)
-
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -44,16 +43,18 @@ func main() {
 			valuePointers[i] = &values[i]
 		}
 
-		err := rows.Scan(valuePointers...)
-		if err != nil {
+		if err := rows.Scan(valuePointers...); err != nil {
 			log.Fatal(err)
 		}
 
+		var query_results []interface{}
+
 		for i, col := range cols {
 
+			query_result_dict := map[interface{}]interface{}{}
 			val := values[i]
-
 			b, ok := val.([]byte)
+
 			var v interface{}
 
 			if ok {
@@ -61,10 +62,14 @@ func main() {
 			} else {
 				v = val
 			}
+			query_result_dict[col] = v
 
-			fmt.Println(col, v)
-
+			fmt.Println(query_result_dict)
+			query_results = append(query_results, query_result_dict)
 		}
+
+		fmt.Println("resutls---------")
+		fmt.Println(query_results)
 
 	}
 
