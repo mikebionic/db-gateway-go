@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 )
 
@@ -15,16 +16,20 @@ import (
 
 // }
 
-type server struct{}
-
-func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func home(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"message": "hello world"}`))
+	switch r.Method {
+	case "GET":
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"message": "get called"}`))
+	case "POST":
+		w.WriteHeader(http.StatusCreated)
+		w.Write([]byte(`{"message": "post called"}`))
+	}
 }
 
 func main() {
-	s := &server{}
-	http.Handle("/", s)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	r := mux.NewRouter()
+	r.HandleFunc("/", home)
+	log.Fatal(http.ListenAndServe(":8080", r))
 }
