@@ -2,11 +2,12 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 )
 
-func do_db_query(query_string string) {
+func do_db_query(query_string string) ([]interface{}, error) {
 	db_type := "postgres"
 	db_user := "postgres"
 	db_password := "123456"
@@ -31,6 +32,7 @@ func do_db_query(query_string string) {
 	cols, _ := rows.Columns()
 
 	var query_results []interface{}
+	var error error
 
 	for rows.Next() {
 
@@ -42,33 +44,37 @@ func do_db_query(query_string string) {
 		}
 
 		if err := rows.Scan(valuePointers...); err != nil {
-			log.Fatal(err)
+			error = err
 		}
 
 		for i, col := range cols {
 			query_result_dict := map[interface{}]interface{}{}
+			var query_value interface{}
 
 			val := values[i]
 			b, ok := val.([]byte)
 
-			var v interface{}
-
 			if ok {
-				v = string(b)
+				query_value = string(b)
 			} else {
-				v = val
+				query_value = val
 			}
-			query_result_dict[col] = v
+			query_result_dict[col] = query_value
 
 			fmt.Println(query_result_dict)
 			query_results = append(query_results, query_result_dict)
 		}
 
-		fmt.Println("resutls---------")
+		fmt.Println("resutls---------", "")
+		// fmt.Println("")
 		fmt.Println(query_results)
 
 	}
 
+	if len(query_results) < 1 {
+		error = errors.New("empty name")
+	}
+
 	defer db.Close()
-	// return nil
+	return query_results, error
 }

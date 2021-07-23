@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
@@ -18,6 +20,10 @@ import (
 
 // }
 
+type QueryRequest struct {
+	QueryString string `json:"query_string"`
+}
+
 func notFound(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusNotFound)
@@ -26,6 +32,20 @@ func notFound(w http.ResponseWriter, r *http.Request) {
 
 func post(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	reqBody, _ := ioutil.ReadAll(r.Body)
+
+	var queryrequest QueryRequest
+	json.Unmarshal(reqBody, &queryrequest)
+	fmt.Println(queryrequest)
+
+	response, err := do_db_query(queryrequest.QueryString)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"message": "error"}`))
+	}
+
+	fmt.Println(response)
+
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte(`{"message": "post called"}`))
 }
@@ -68,7 +88,7 @@ func withParams(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(fmt.Sprintf(`{"userID": %d, "commentID": %d, "location": "%s" }`, userID, commentID, location)))
 }
 
-func main() {
+func handleRequests() {
 	r := mux.NewRouter()
 	api := r.PathPrefix("/api/v1").Subrouter()
 	api.HandleFunc("", get).Methods(http.MethodGet)
@@ -77,4 +97,8 @@ func main() {
 	api.HandleFunc("/user/{userID}/comment/{commentID}", withParams).Methods(http.MethodGet)
 
 	log.Fatal(http.ListenAndServe(":8080", r))
+}
+
+func main() {
+	handleRequests()
 }
