@@ -45,9 +45,23 @@ func post(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Println(response)
+	type RespObject struct {
+		Data []interface{}
+	}
+	respObject := RespObject{response}
+	data, err := json.Marshal(respObject)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("", data)
 
-	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(`{"message": "post called"}`))
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(data)
+	// var res map[string]interface{}
+	// json.Marshal(&response, &res)
+
+	// w.Write([]byte(`{"message": "post called"}`))
 }
 
 func get(w http.ResponseWriter, r *http.Request) {
@@ -96,6 +110,7 @@ func handleRequests() {
 	api.HandleFunc("", notFound)
 	api.HandleFunc("/user/{userID}/comment/{commentID}", withParams).Methods(http.MethodGet)
 
+	fmt.Println("Server started")
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
 
