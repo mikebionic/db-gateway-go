@@ -47,6 +47,22 @@ func (a *App) initializeRoutes() {
 
 }
 
+////////
+
+func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
+	response, _ := json.Marshal(payload)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	w.Write(response)
+}
+
+func respondWithError(w http.ResponseWriter, code int, message string) {
+	respondWithJSON(w, code, map[string]string{"error": message})
+}
+
+////////
+
 type QueryRequest struct {
 	QueryString string `json:"query_string"`
 }
@@ -59,30 +75,28 @@ func (a *App) apiMakeDbRequest(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(reqBody, &queryrequest)
 	fmt.Println(queryrequest)
 
-	response, err := do_db_query(queryrequest.QueryString)
+	response, err := do_db_query(a.DB, queryrequest.QueryString)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"message": "error"}`))
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
 	}
+	respondWithJSON(w, http.StatusOK, response)
 
 	fmt.Println(response)
-	type RespObject struct {
-		Data []interface{}
-	}
-	respObject := RespObject{response}
-	data, err := json.Marshal(respObject)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println("", data)
+	// type RespObject struct {
+	// 	Data map[string]interface{}
+	// }
+	// respObject := RespObject{response}
+	// data, err := json.Marshal(respObject)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+	// fmt.Println("", data)
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(data)
-	// var res map[string]interface{}
-	// json.Marshal(&response, &res)
+	// w.Header().Set("Content-Type", "application/json")
+	// w.WriteHeader(http.StatusOK)
+	// // w.Write(data)
 
-	// w.Write([]byte(`{"message": "post called"}`))
 }
 
 func (a *App) getRequest(w http.ResponseWriter, r *http.Request) {

@@ -4,38 +4,26 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"log"
 )
 
-func do_db_query(query_string string) ([]interface{}, error) {
-	db_type := "postgres"
-	db_user := "postgres"
-	db_password := "123456"
-	db_host := "localhost"
-	db_database := "dbSapHasap"
+type query_response map[string]interface{}
 
-	connStr := fmt.Sprintf("%s://%s:%s@%s/%s?sslmode=disable", db_type, db_user, db_password, db_host, db_database)
+func do_db_query(db *sql.DB, query_string string) ([]query_response, error) {
 
-	db, err := sql.Open("postgres", connStr)
+	rows, err := db.Query(query_string)
 	if err != nil {
-		log.Fatal(err)
-	}
-
-	query_request := query_string
-
-	rows, err := db.Query(query_request)
-	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	defer rows.Close()
 
-	cols, _ := rows.Columns()
-
-	var query_results []interface{}
-	var error error
+	query_results := []query_response{}
 
 	for rows.Next() {
 
+		r := make(query_response)
+		cols, _ := rows.Columns()
+
+		fmt.Println(cols, "\n", len(cols))
 		values := make([]interface{}, len(cols))
 		valuePointers := make([]interface{}, len(cols))
 
@@ -43,12 +31,14 @@ func do_db_query(query_string string) ([]interface{}, error) {
 			valuePointers[i] = &values[i]
 		}
 
+		fmt.Println("\n", valuePointers)
+
 		if err := rows.Scan(valuePointers...); err != nil {
-			error = err
+			return nil, err
 		}
 
 		for i, col := range cols {
-			query_result_dict := map[interface{}]interface{}{}
+
 			var query_value interface{}
 
 			val := values[i]
@@ -59,22 +49,23 @@ func do_db_query(query_string string) ([]interface{}, error) {
 			} else {
 				query_value = val
 			}
-			query_result_dict[col] = query_value
+			r[col] = query_value
 
-			fmt.Println(query_result_dict)
-			query_results = append(query_results, query_result_dict)
 		}
+		fmt.Println(r)
+		query_results = append(query_results, r)
 
-		fmt.Println("resutls---------", "")
-		// fmt.Println("")
-		fmt.Println(query_results)
+		// fmt.Println("\n resutls---------")
+		// fmt.Println(query_results)
+		// fmt.Println("\n", "fuck", "you", "+++++++++++++++++")
 
 	}
 
 	if len(query_results) < 1 {
-		error = errors.New("empty name")
+		err = errors.New("ot found")
+		return nil, err
 	}
 
-	defer db.Close()
-	return query_results, error
+	// defer db.Close()
+	return query_results, nil
 }
