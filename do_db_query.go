@@ -52,7 +52,7 @@ func do_db_select_query(db *sql.DB, query_string string) ([]query_response, erro
 	}
 
 	if len(query_results) < 1 {
-		err = errors.New("ot found")
+		err = errors.New("empty response")
 		return nil, err
 	}
 
