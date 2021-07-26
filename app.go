@@ -68,34 +68,43 @@ type QueryRequest struct {
 }
 
 func (a *App) apiMakeDbRequest(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	reqBody, _ := ioutil.ReadAll(r.Body)
+
+	executeOnly := r.URL.Query().Get("executeOnly")
+	executeOnly_state := 0
+	var err error
+
+	if len(executeOnly) > 0 {
+		executeOnly_state, err = strconv.Atoi(executeOnly)
+		if err != nil {
+			respondWithError(w, http.StatusBadRequest, err.Error())
+		}
+	}
+
+	reqBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+	}
 
 	var queryrequest QueryRequest
 	json.Unmarshal(reqBody, &queryrequest)
 	fmt.Println(queryrequest)
 
-	response, err := do_db_query(a.DB, queryrequest.QueryString)
+	var response interface{}
+	switch executeOnly_state {
+	case 0:
+		response, err = do_db_select_query(a.DB, queryrequest.QueryString)
+
+	default:
+		err = do_db_query_exec(a.DB, queryrequest.QueryString)
+		response = map[string]interface{}{"status": 1}
+
+	}
+
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	respondWithJSON(w, http.StatusOK, response)
-
-	fmt.Println(response)
-	// type RespObject struct {
-	// 	Data map[string]interface{}
-	// }
-	// respObject := RespObject{response}
-	// data, err := json.Marshal(respObject)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
-	// fmt.Println("", data)
-
-	// w.Header().Set("Content-Type", "application/json")
-	// w.WriteHeader(http.StatusOK)
-	// // w.Write(data)
 
 }
 

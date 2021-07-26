@@ -3,12 +3,11 @@ package main
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 )
 
 type query_response map[string]interface{}
 
-func do_db_query(db *sql.DB, query_string string) ([]query_response, error) {
+func do_db_select_query(db *sql.DB, query_string string) ([]query_response, error) {
 
 	rows, err := db.Query(query_string)
 	if err != nil {
@@ -23,15 +22,12 @@ func do_db_query(db *sql.DB, query_string string) ([]query_response, error) {
 		r := make(query_response)
 		cols, _ := rows.Columns()
 
-		fmt.Println(cols, "\n", len(cols))
 		values := make([]interface{}, len(cols))
 		valuePointers := make([]interface{}, len(cols))
 
 		for i := range cols {
 			valuePointers[i] = &values[i]
 		}
-
-		fmt.Println("\n", valuePointers)
 
 		if err := rows.Scan(valuePointers...); err != nil {
 			return nil, err
@@ -52,13 +48,7 @@ func do_db_query(db *sql.DB, query_string string) ([]query_response, error) {
 			r[col] = query_value
 
 		}
-		fmt.Println(r)
 		query_results = append(query_results, r)
-
-		// fmt.Println("\n resutls---------")
-		// fmt.Println(query_results)
-		// fmt.Println("\n", "fuck", "you", "+++++++++++++++++")
-
 	}
 
 	if len(query_results) < 1 {
@@ -68,4 +58,14 @@ func do_db_query(db *sql.DB, query_string string) ([]query_response, error) {
 
 	// defer db.Close()
 	return query_results, nil
+}
+
+func do_db_query_exec(db *sql.DB, query_string string) error {
+
+	_, err := db.Query(query_string)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
