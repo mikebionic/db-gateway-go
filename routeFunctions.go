@@ -34,25 +34,34 @@ func (a *App) apiMakeDbRequest(w http.ResponseWriter, r *http.Request) {
 
 	var queryrequest QueryRequest
 	json.Unmarshal(reqBody, &queryrequest)
-	fmt.Println(queryrequest)
+	// fmt.Println(queryrequest)
 
-	var response interface{}
+	var response []query_response
+
 	switch executeOnly_state {
 	case 0:
 		response, err = do_db_select_query(a.DB, queryrequest.QueryString)
-
 	default:
 		err = do_db_query_exec(a.DB, queryrequest.QueryString)
-		response = map[string]interface{}{"status": 1}
-
 	}
 
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	respondWithJSON(w, http.StatusOK, response)
 
+	res := make(map[string]interface{})
+	res["message"] = "db query result"
+	res["data"] = response
+
+	if executeOnly_state == 0 {
+		res["total"] = len(response)
+	} else {
+		res["total"] = 1
+		res["status"] = 1
+	}
+
+	respondWithJSON(w, http.StatusOK, res)
 }
 
 func (a *App) getRequest(w http.ResponseWriter, r *http.Request) {

@@ -36,8 +36,8 @@ func (a *App) Run(addr string) {
 
 func (a *App) initializeRoutes() {
 	api := a.Router.PathPrefix("/api/v1").Subrouter()
-	api.HandleFunc("", a.getRequest).Methods(http.MethodGet)
-	api.HandleFunc("", a.apiMakeDbRequest).Methods(http.MethodPost)
-	api.HandleFunc("", a.notFound)
+	api.HandleFunc("/", a.getRequest).Methods(http.MethodGet)
+	api.HandleFunc("/make-db-request", a.apiMakeDbRequest).Methods(http.MethodPost)
+	api.HandleFunc("/", a.notFound)
 	api.HandleFunc("/user/{userID}/comment/{commentID}", a.withParams).Methods(http.MethodGet)
 }
