@@ -1,9 +1,9 @@
 {
   "listen_address": "0.0.0.0:8000",
-	"db_type": "postgres",
-	"db_user": "postgres",
+	"db_type": "sqlserver",
+	"db_user": "sa",
 	"db_password": "123456",
-	"db_host": "localhost",
-	"db_database": "database",
-  "db_params": "sslmode=disable"
+	"db_host": "192.168.31.132:1433",
+	"db_database": "dbSapHasap",
+	"db_params": ""
 }
