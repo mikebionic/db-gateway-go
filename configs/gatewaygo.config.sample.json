@@ -1,0 +1,8 @@
+{
+  "listen_address": "0.0.0.0:8130",
+	"db_type": "postgres",
+	"db_user": "postgres",
+	"db_password": "123456",
+	"db_host": "localhost",
+	"db_database": "database"
+}
