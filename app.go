@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 )
@@ -15,12 +16,18 @@ type App struct {
 	DB     *sql.DB
 }
 
-func (a *App) Initialize(db_type, db_user, db_password, db_host, db_database string) {
+func (a *App) Initialize(db_type, db_user, db_password, db_host, db_database, db_params string) {
 
-	connStr := fmt.Sprintf("%s://%s:%s@%s/%s?sslmode=disable", db_type, db_user, db_password, db_host, db_database)
+	var connStr string
+	switch db_type {
+	case "sqlserver":
+		connStr = fmt.Sprintf("%s://%s:%s@%s/instance?database=%s&%s", db_type, db_user, db_password, db_host, db_database, db_params)
+	default:
+		connStr = fmt.Sprintf("%s://%s:%s@%s/%s?%s", db_type, db_user, db_password, db_host, db_database, db_params)
+	}
 
 	var err error
-	a.DB, err = sql.Open("postgres", connStr)
+	a.DB, err = sql.Open(db_type, connStr)
 	if err != nil {
 		log.Fatal(err)
 	}

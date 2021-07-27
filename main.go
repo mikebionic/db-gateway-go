@@ -18,6 +18,7 @@ type config struct {
 	DB_Password   string `json:"db_password"`
 	DB_Host       string `json:"db_host"`
 	DB_Database   string `json:"db_database"`
+	DB_Params     string `json:"db_params"`
 }
 
 func ReadConfig(source string) (c *config, err error) {
@@ -62,6 +63,7 @@ func run() error {
 	db_password := conf.DB_Password
 	db_host := conf.DB_Host
 	db_database := conf.DB_Database
+	db_params := conf.DB_Params
 
 	a := App{}
 	a.Initialize(
@@ -70,6 +72,7 @@ func run() error {
 		db_password,
 		db_host,
 		db_database,
+		db_params,
 	)
 
 	a.Run(conf.ListenAddress)
