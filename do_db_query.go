@@ -2,7 +2,9 @@ package main
 
 import (
 	"database/sql"
+	"encoding/base64"
 	"errors"
+	"reflect"
 )
 
 type query_response map[string]interface{}
@@ -38,6 +40,16 @@ func do_db_select_query(db *sql.DB, query_string string) ([]query_response, erro
 			var query_value interface{}
 
 			val := values[i]
+			// fmt.Printf("%T\n", val)
+			// fmt.Println(reflect.TypeOf(val).Kind())
+
+			if reflect.TypeOf(val).Kind() == reflect.Slice {
+				slice_type, ok := val.([]uint8)
+				if ok {
+					str := base64.StdEncoding.EncodeToString(slice_type)
+					val = str
+				}
+			}
 			b, ok := val.([]byte)
 
 			if ok {
