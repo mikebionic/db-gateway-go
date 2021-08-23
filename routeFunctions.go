@@ -11,7 +11,8 @@ import (
 )
 
 type QueryRequest struct {
-	QueryString string `json:"query_string"`
+	QueryString   string   `json:"query_string"`
+	Base64Columns []string `json:"base64_columns"`
 }
 
 func (a *App) apiMakeDbRequest(w http.ResponseWriter, r *http.Request) {
@@ -40,7 +41,7 @@ func (a *App) apiMakeDbRequest(w http.ResponseWriter, r *http.Request) {
 
 	switch executeOnly_state {
 	case 0:
-		response, err = do_db_select_query(a.DB, queryrequest.QueryString)
+		response, err = do_db_select_query(a.DB, queryrequest.QueryString, queryrequest.Base64Columns)
 	default:
 		err = do_db_query_exec(a.DB, queryrequest.QueryString)
 	}

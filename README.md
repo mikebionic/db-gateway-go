@@ -11,9 +11,12 @@ API for making direct sql requests to a MSSQL or Postgresql dataabses
 ```json
 {
 	"query_string": "select * from tbl_mg_materials",
+  "base64_columns": [ "group_code", "image_pict", "firm_id_guid"]
 	//"query_string": "select \"ResName\" from tbl_dk_resource",
 }
 ```
+
+> **base64_columns** - are the ones you prefer to be encoded in base64. You need it mostly in image BLOB
 
 **Response**
 ```json

@@ -9,7 +9,7 @@ import (
 
 type query_response map[string]interface{}
 
-func do_db_select_query(db *sql.DB, query_string string) ([]query_response, error) {
+func do_db_select_query(db *sql.DB, query_string string, base64_columns []string) ([]query_response, error) {
 
 	rows, err := db.Query(query_string)
 	if err != nil {
@@ -41,15 +41,21 @@ func do_db_select_query(db *sql.DB, query_string string) ([]query_response, erro
 
 			val := values[i]
 			// fmt.Printf("%T\n", val)
-			// fmt.Println(reflect.TypeOf(val).Kind())
+			// fmt.Println(reflect.TypeOf(val))
 
-			if reflect.TypeOf(val).Kind() == reflect.Slice {
-				slice_type, ok := val.([]uint8)
+			if contains_in_slice(base64_columns, col) {
+				slice_type, ok := val.([]byte)
 				if ok {
-					str := base64.StdEncoding.EncodeToString(slice_type)
-					val = str
+					val = base64.StdEncoding.EncodeToString(slice_type)
+				}
+				if !ok {
+					if reflect.TypeOf(val).Kind() == reflect.String {
+						slice_type := []byte(val.(string))
+						val = base64.StdEncoding.EncodeToString(slice_type)
+					}
 				}
 			}
+
 			b, ok := val.([]byte)
 
 			if ok {
