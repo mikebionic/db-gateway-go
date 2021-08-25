@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	_ "github.com/denisenkom/go-mssqldb"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 )
@@ -38,7 +39,12 @@ func (a *App) Initialize(db_type, db_user, db_password, db_host, db_database, db
 
 func (a *App) Run(addr string) {
 	fmt.Printf("Server running on  %s \n", addr)
-	log.Fatal(http.ListenAndServe(addr, a.Router))
+	credentials := handlers.AllowCredentials()
+	methods := handlers.AllowedMethods([]string{"GET", "POST"})
+	// ttl := handlers.MaxAge(3600)
+	origins := handlers.AllowedOrigins([]string{"*"})
+
+	log.Fatal(http.ListenAndServe(addr, handlers.CORS(credentials, methods, origins)(a.Router)))
 }
 
 func (a *App) initializeRoutes() {
