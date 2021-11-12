@@ -45,13 +45,17 @@ func do_db_select_query(db *sql.DB, query_string string, base64_columns []string
 
 			if contains_in_slice(base64_columns, col) {
 				slice_type, ok := val.([]byte)
-				if ok {
-					val = base64.StdEncoding.EncodeToString(slice_type)
-				}
-				if !ok {
-					if reflect.TypeOf(val).Kind() == reflect.String {
-						slice_type := []byte(val.(string))
+				if reflect.TypeOf(val) == nil {
+					val = nil
+				} else {
+					if ok {
 						val = base64.StdEncoding.EncodeToString(slice_type)
+					}
+					if !ok {
+						if reflect.TypeOf(val).Kind() == reflect.String {
+							slice_type := []byte(val.(string))
+							val = base64.StdEncoding.EncodeToString(slice_type)
+						}
 					}
 				}
 			}
