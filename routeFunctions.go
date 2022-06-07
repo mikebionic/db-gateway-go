@@ -35,7 +35,7 @@ func (a *App) apiMakeDbRequest(w http.ResponseWriter, r *http.Request) {
 
 	var queryrequest QueryRequest
 	json.Unmarshal(reqBody, &queryrequest)
-	// fmt.Println(queryrequest)
+	fmt.Println(queryrequest)
 
 	var response []query_response
 
@@ -45,6 +45,7 @@ func (a *App) apiMakeDbRequest(w http.ResponseWriter, r *http.Request) {
 	default:
 		err = do_db_query_exec(a.DB, queryrequest.QueryString)
 	}
+	fmt.Print(response, err)
 
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())

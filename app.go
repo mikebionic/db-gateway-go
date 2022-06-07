@@ -26,6 +26,7 @@ func (a *App) Initialize(db_type, db_user, db_password, db_host, db_database, db
 	default:
 		connStr = fmt.Sprintf("%s://%s:%s@%s/%s?%s", db_type, db_user, db_password, db_host, db_database, db_params)
 	}
+	fmt.Print(connStr)
 
 	var err error
 	a.DB, err = sql.Open(db_type, connStr)
