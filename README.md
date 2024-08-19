@@ -1,6 +1,8 @@
 # Database gateway API
 
 API for making direct sql requests to a MSSQL or Postgresql dataabses
+It used to make an API for PostgreSQL or MSSQL databases for fast deploying simple db-related API's for checking the data (like firebase)
+Being silly and easy it provides fast queries to database and correct json responses, and it's still used for simple prototyping and data exchange for easy and on-testing web, mobile, desktop apps.
 
 > Request for Select query
 
