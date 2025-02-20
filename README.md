@@ -1,8 +1,20 @@
 # Database gateway API
 
+A lightweight and deployment-friendly API gateway for making direct SQL queries to PostgreSQL and MSSQL databases. Designed for fast prototyping and data exchange, it simplifies API creation for database-driven applications without complex backend logic.
+Key Features:
+
+    📡 Instant API – Generate database-backed APIs in minutes.
+    ⚡ Fast & Simple – Execute SQL queries with minimal setup.
+    🔄 JSON Responses – Returns structured, consistent JSON outputs.
+    🔗 Multi-Platform Use – Ideal for web, mobile, and desktop apps.
+    🛠 Perfect for Prototyping – Quickly test database interactions without a full backend.
+
+Whether you're building an MVP, testing data integrations, or need a simple interface for accessing your database, Database Gateway API delivers a hassle-free solution! 🚀
+
 API for making direct sql requests to a MSSQL or Postgresql dataabses
 It used to make an API for PostgreSQL or MSSQL databases for fast deploying simple db-related API's for checking the data (like firebase)
 Being silly and easy it provides fast queries to database and correct json responses, and it's still used for simple prototyping and data exchange for easy and on-testing web, mobile, desktop apps.
+
 
 > Request for Select query
 
